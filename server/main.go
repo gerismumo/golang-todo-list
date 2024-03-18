@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,9 +12,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func main() {
+type Todo struct {
+	Task string `json:"task"`
+}
 
-	db, err := sql.Open("mysql", "todoList:todoList@(localhost:3306)/todoList?parseTime=true")
+var db *sql.DB
+
+func main() {
+	var err error
+	db, err = sql.Open("mysql", "todoList:todoList@(localhost:3306)/todoList?parseTime=true")
 
 	if err != nil {
 		log.Println("Error connecting to the database:", err)
@@ -44,9 +51,75 @@ func main() {
 }
 
 func addTodo(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Body)
+	var todo Todo
+	json.NewDecoder(r.Body).Decode(&todo)
 
-	log.Println("Hello World!")
+	// if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
+
+	defer r.Body.Close()
+
+	if todo.Task == "" {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "Task cannot be empty",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+		return
+	}
+
+	//insert data into database
+	result, err := db.Exec("INSERT INTO todo_list (name) VALUES (?)", todo.Task)
+
+	if err != nil {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "Server failed",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "unsuccessful submission",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	if rowsAffected > 0 {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: true,
+			Message: "successfully created",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func allowOnlyFrom(allowedDomain string, handler http.Handler) http.Handler {

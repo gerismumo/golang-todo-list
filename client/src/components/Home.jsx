@@ -16,11 +16,9 @@ const Home = () => {
         e.preventDefault();
 
         try {
-            const data = {
-                todoName,
-            }
+           
 
-            const response = await axios.post(`${Db_url}/api/addTodo`,data);
+            const response = await axios.post(`${Db_url}/api/addTodo`, {task:todoName});
             console.log(response.data);
 
         }catch(error) {
