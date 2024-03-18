@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan} from '@fortawesome/free-solid-svg-icons';
 import {faPenToSquare } from '@fortawesome/free-regular-svg-icons';
@@ -11,6 +11,20 @@ const Home = () => {
     
     const[todoName, setTodoName] = useState('');
     const[searchTodo, setSearchTodo] = useState('');
+
+    const todoList = async() => {
+        try {
+            const response = await axios.get(`${Db_url}/api/getTodo`);
+            console.log(response.data);
+            
+        }catch(error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        todoList();
+    },[])
 
     const handleAddTodo = async(e) => {
         e.preventDefault();
