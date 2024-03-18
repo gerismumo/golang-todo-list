@@ -21,10 +21,10 @@ const Home = () => {
             }
 
             const response = await axios.post(`${Db_url}/api/addTodo`,data);
-            console.log(response);
+            console.log(response.data);
 
         }catch(error) {
-            console.log(error);
+            console.log(error.message);
         }
 
     }
