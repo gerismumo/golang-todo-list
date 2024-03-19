@@ -19,7 +19,7 @@ const Home = () => {
     const handleOpenEdit = (id) => {
         setEditId(id);
         setCurrentTodo(todoList.find(todo => todo.id === id));
-        console.log(currentTodo);
+        // console.log(currentTodo);
         if(!openEdit) {
             setOpenEdit(true);
         }else {

@@ -3,23 +3,20 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
 	"github.com/gorilla/mux"
 )
 
-
 func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	db := connectDb()
-	
+
 	defer db.Close()
 
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	if id == "" {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "ID cannot be empty",
 		}
@@ -33,10 +30,7 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	result, err := db.Exec("DELETE FROM todo_list WHERE id =?", id)
 
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Server failed",
 		}
@@ -49,10 +43,7 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	rowsAffected, err := result.RowsAffected()
 
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "unsuccessful submission",
 		}
@@ -63,10 +54,7 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rowsAffected > 0 {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: true,
 			Message: "successfully deleted",
 		}

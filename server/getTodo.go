@@ -17,12 +17,14 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT * FROM todo_list")
 
+	type responseData struct {
+		Success bool        `json:"success"`
+		Message string      `json:"message"`
+		Data    []QueryTodo `json:"data"`
+	}
+
 	if err != nil {
-		response := struct {
-			Success bool        `json:"success"`
-			Message string      `json:"message"`
-			Data    []QueryTodo `json:"data"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Server failed",
 			Data:    nil,
@@ -40,11 +42,7 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&queryTodo.ID, &queryTodo.Name, &queryTodo.CreatedAt)
 
 		if err != nil {
-			response := struct {
-				Success bool        `json:"success"`
-				Message string      `json:"message"`
-				Data    []QueryTodo `json:"data"`
-			}{
+			response := responseData{
 				Success: false,
 				Message: "Server failed",
 				Data:    nil,
@@ -57,11 +55,7 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 		todos = append(todos, queryTodo)
 	}
 
-	response := struct {
-		Success bool        `json:"success"`
-		Message string      `json:"message"`
-		Data    []QueryTodo `json:"data"`
-	}{
+	response := responseData{
 		Success: true,
 		Message: "successfully executed",
 		Data:    todos,

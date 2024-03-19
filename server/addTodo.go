@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+
+
 func addTodo(w http.ResponseWriter, r *http.Request) {
 	db := connectDb()
 	defer db.Close()
@@ -12,18 +14,10 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 
-	// if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
-
 	defer r.Body.Close()
 
 	if todo.Task == "" {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Task cannot be empty",
 		}
@@ -38,10 +32,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 	result, err := db.Exec("INSERT INTO todo_list (name) VALUES (?)", todo.Task)
 
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Server failed",
 		}
@@ -53,10 +44,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "unsuccessful submission",
 		}
@@ -67,10 +55,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rowsAffected > 0 {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: true,
 			Message: "successfully created",
 		}

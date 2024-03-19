@@ -19,10 +19,7 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&todo)
 
 	if id == "" || todo.Task == "" {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Fill all the fields",
 		}
@@ -36,10 +33,7 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	result, err := db.Exec("UPDATE todo_list SET name =? WHERE id = ?", todo.Task, id)
 
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "Server failed",
 		}
@@ -52,10 +46,7 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	rowsAffected, err := result.RowsAffected()
 
 	if err != nil {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: false,
 			Message: "unsuccessful submission",
 		}
@@ -66,10 +57,7 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rowsAffected > 0 {
-		response := struct {
-			Success bool   `json:"success"`
-			Message string `json:"message"`
-		}{
+		response := responseData{
 			Success: true,
 			Message: " edited successfully",
 		}

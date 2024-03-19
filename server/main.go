@@ -14,10 +14,13 @@ type Todo struct {
 	Task string `json:"task"`
 }
 
-
+type responseData struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
 
 func main() {
-	
+
 	//routes
 
 	router := mux.NewRouter()
@@ -40,7 +43,6 @@ func main() {
 	fmt.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", corsHandler))
 }
-
 
 func allowOnlyFrom(allowedDomain string, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
