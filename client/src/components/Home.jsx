@@ -86,6 +86,14 @@ const Home = () => {
         }
     }
 
+    //search todo
+
+    const filterData = todoList.filter(todo => 
+        todo.id.toString().toLowerCase().includes(searchTodo.toLowerCase()) ||
+        todo.name.toString().toLowerCase().includes(searchTodo.toLowerCase()) ||
+        todo.createdAt.toString().toLowerCase().includes(searchTodo.toLowerCase())
+        )
+
   return (
     <div className="flex flex-row justify-center py-[40px]">
         <div className="flex flex-col justify-center items-center ">
@@ -93,8 +101,10 @@ const Home = () => {
                 <h1 className='text-[35px] font-[700]'>Golang Todo</h1>
             </div>
             <div className="flex flex-row justify-between items-center  gap-[100px] mt-[50px]">
-                    <form action="" className='flex flex-row gap-[20px] items-center '>
+                    <form className='flex flex-row gap-[20px] items-center '>
                         <input type="text" 
+                        value={searchTodo}
+                        onChange={(e) => setSearchTodo(e.target.value)}
                         placeholder="Search Todo" 
                         className=' py-[5px] px-[4px] border-[1px] border-[#068FFF] rounded-[6px] outline-none '
                         />
@@ -123,12 +133,12 @@ const Home = () => {
                         <th className='border border-[#ddd] px-[30px] py-[10px]'>Created At</th>
                     </thead>
                     <tbody>
-                        {todoList.length === 0 ? (
+                        {filterData.length === 0 ? (
                             <tr>
-                                <td className='border border-[#ddd] px-[30px] py-[10px]'><span>No Data</span></td>
+                                <td colSpan="5" className='border border-[#ddd] px-[30px] py-[10px]'><span>No Data</span></td>
                             </tr>
                         ): (
-                            todoList.map((todo) => (
+                            filterData.map((todo) => (
                                 <React.Fragment key={todo.id}>
                                     <tr >
                                         <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.id}</td>
