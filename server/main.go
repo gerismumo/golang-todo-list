@@ -42,6 +42,8 @@ func main() {
 	//routes
 	router.HandleFunc("/api/addTodo", addTodo).Methods("POST")
 	router.HandleFunc("/api/getTodo", getTodo).Methods("GET")
+	router.HandleFunc("/api/deleteTodo/{id}", deleteTodo).Methods("DELETE")
+	router.HandleFunc("/api/editTodo/{id}", editTodo).Methods("PUT")
 
 	//cors handler
 
@@ -188,6 +190,83 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+
+func deleteTodo(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+	id := vars["id"]
+
+	
+
+	if id == "" {
+		response := struct {
+            Success bool   `json:"success"`
+            Message string `json:"message"`
+        }{
+            Success: false,
+            Message: "ID cannot be empty",
+        }
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+		return
+	}
+
+	result, err := db.Exec("DELETE FROM todo_list WHERE id =?", id)
+
+	if err!= nil {
+		response := struct {
+            Success bool   `json:"success"`
+            Message string `json:"message"`
+        }{
+            Success: false,
+            Message: "Server failed",
+        }
+
+		w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(response)
+        return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err!= nil {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "unsuccessful submission",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	log.Println("deleteTodo", rowsAffected);
+
+	if(rowsAffected > 0) {
+		response := struct {
+            Success bool   `json:"success"`
+            Message string `json:"message"`
+        }{
+            Success: true,
+            Message: "successfully deleted",
+        }
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+		return
+	}
+}
+
+
+func editTodo(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func allowOnlyFrom(allowedDomain string, handler http.Handler) http.Handler {

@@ -12,33 +12,63 @@ const Home = () => {
     const[todoName, setTodoName] = useState('');
     const[searchTodo, setSearchTodo] = useState('');
 
-    const todoList = async() => {
+    const[todoList, setTodoList] = useState([]);
+
+
+    const getTodo = async() => {
         try {
             const response = await axios.get(`${Db_url}/api/getTodo`);
-            console.log(response.data);
-            
+            // console.log(response.data);
+            if(response.data.success) {
+                setTodoList(response.data.data);
+            }
         }catch(error) {
             console.log(error);
         }
     }
 
     useEffect(() => {
-        todoList();
+        getTodo();
     },[])
 
     const handleAddTodo = async(e) => {
         e.preventDefault();
 
         try {
-           
-
             const response = await axios.post(`${Db_url}/api/addTodo`, {task:todoName});
-            console.log(response.data);
+            if(response.data.success) {
+                getTodo();
+            }
 
         }catch(error) {
             console.log(error.message);
         }
 
+    }
+
+    const handleDeleteTodo = async(id) => {
+        try {
+            const response = await axios.delete(`${Db_url}/api/deleteTodo/${id}`);
+            // console.log(response.data);
+            if(response.data.success) {
+                getTodo();
+            }
+        }catch(error) {
+            console.log(error.message);
+        }
+    }
+
+
+    const handleEditTodo = async(id) => {
+        try {
+            const response = await axios.put(`${Db_url}/api/editTodo/${id}`);
+            console.log(response.data);
+            if(response.data.success) {
+                getTodo();
+            }
+        }catch(error) {
+            console.log(error.message);
+        }
     }
 
   return (
@@ -78,27 +108,25 @@ const Home = () => {
                         <th className='border border-[#ddd] px-[30px] py-[10px]'>Created At</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>1</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>Gera</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>789</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='red' icon={faTrashCan} /></td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></td>
-                        </tr>
-                        <tr>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>2</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>Gera</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>789</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='red' icon={faTrashCan} /></td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></td>
-                        </tr>
-                        <tr>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>3</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>Gera</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'>789</td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='red' icon={faTrashCan} /></td>
-                            <td className='border border-[#ddd] px-[30px] py-[10px]'><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></td>
-                        </tr>
+                        {todoList.length === 0 ? (
+                            <tr>
+                                <td className='border border-[#ddd] px-[30px] py-[10px]'><span>No Data</span></td>
+                            </tr>
+                        ): (
+                            todoList.map((todo) => (
+                                <tr key={todo.id}>
+                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.id}</td>
+                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.name}</td>
+                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.createdAt}</td>
+                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>
+                                        <span onClick={() => handleDeleteTodo(todo.id)}> <FontAwesomeIcon color='red' icon={faTrashCan} /></span>
+                                    </td>
+                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>
+                                        <span onClick={() => handleEditTodo(todo.id)}><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></span>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
