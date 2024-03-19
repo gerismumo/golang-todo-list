@@ -16,8 +16,6 @@ type Todo struct {
 	Task string `json:"task"`
 }
 
-
-
 var db *sql.DB
 
 func main() {
@@ -131,7 +129,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func getTodo(w http.ResponseWriter, r *http.Request) {
-	type QueryTodo  struct {
+	type QueryTodo struct {
 		ID        int    `json:"id"`
 		Name      string `json:"name"`
 		CreatedAt string `json:"createdAt"`
@@ -192,21 +190,18 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-
 func deleteTodo(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
+	vars := mux.Vars(r)
 	id := vars["id"]
-
-	
 
 	if id == "" {
 		response := struct {
-            Success bool   `json:"success"`
-            Message string `json:"message"`
-        }{
-            Success: false,
-            Message: "ID cannot be empty",
-        }
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "ID cannot be empty",
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
@@ -216,23 +211,23 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 
 	result, err := db.Exec("DELETE FROM todo_list WHERE id =?", id)
 
-	if err!= nil {
+	if err != nil {
 		response := struct {
-            Success bool   `json:"success"`
-            Message string `json:"message"`
-        }{
-            Success: false,
-            Message: "Server failed",
-        }
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "Server failed",
+		}
 
 		w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(response)
-        return
+		json.NewEncoder(w).Encode(response)
+		return
 	}
 
 	rowsAffected, err := result.RowsAffected()
 
-	if err!= nil {
+	if err != nil {
 		response := struct {
 			Success bool   `json:"success"`
 			Message string `json:"message"`
@@ -246,16 +241,16 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("deleteTodo", rowsAffected);
 
-	if(rowsAffected > 0) {
+
+	if rowsAffected > 0 {
 		response := struct {
-            Success bool   `json:"success"`
-            Message string `json:"message"`
-        }{
-            Success: true,
-            Message: "successfully deleted",
-        }
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: true,
+			Message: "successfully deleted",
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
@@ -264,9 +259,75 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func editTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
+	var todo Todo
+	json.NewDecoder(r.Body).Decode(&todo)
+
+	if id == "" || todo.Task == "" {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "Fill all the fields",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+		return
+	}
+
+	result, err := db.Exec("UPDATE todo_list SET name =? WHERE id = ?", todo.Task, id)
+
+	if err != nil {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "Server failed",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: false,
+			Message: "unsuccessful submission",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+
+	if rowsAffected > 0 {
+		response := struct {
+			Success bool   `json:"success"`
+			Message string `json:"message"`
+		}{
+			Success: true,
+			Message: " edited successfully",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+		return
+	}
 }
 
 func allowOnlyFrom(allowedDomain string, handler http.Handler) http.Handler {

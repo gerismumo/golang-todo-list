@@ -14,6 +14,19 @@ const Home = () => {
 
     const[todoList, setTodoList] = useState([]);
 
+    const [currentTodo, setCurrentTodo] = useState(null);
+    const [editId, setEditId] = useState(null);
+    const handleOpenEdit = (id) => {
+        setEditId(id);
+        setCurrentTodo(todoList.find(todo => todo.id === id));
+        console.log(currentTodo);
+        if(!openEdit) {
+            setOpenEdit(true);
+        }else {
+            setOpenEdit(false);
+        }
+    }
+
 
     const getTodo = async() => {
         try {
@@ -59,12 +72,14 @@ const Home = () => {
     }
 
 
-    const handleEditTodo = async(id) => {
+    const handleEditTodo = async(e, id) => {
+        e.preventDefault();
         try {
-            const response = await axios.put(`${Db_url}/api/editTodo/${id}`);
-            console.log(response.data);
+            const response = await axios.put(`${Db_url}/api/editTodo/${id}`, {task: currentTodo.name});
+            // console.log(response.data);
             if(response.data.success) {
                 getTodo();
+                setOpenEdit(false);
             }
         }catch(error) {
             console.log(error.message);
@@ -114,17 +129,38 @@ const Home = () => {
                             </tr>
                         ): (
                             todoList.map((todo) => (
-                                <tr key={todo.id}>
-                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.id}</td>
-                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.name}</td>
-                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.createdAt}</td>
-                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>
-                                        <span onClick={() => handleDeleteTodo(todo.id)}> <FontAwesomeIcon color='red' icon={faTrashCan} /></span>
-                                    </td>
-                                    <td className='border border-[#ddd] px-[30px] py-[10px]'>
-                                        <span onClick={() => handleEditTodo(todo.id)}><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></span>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={todo.id}>
+                                    <tr >
+                                        <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.id}</td>
+                                        <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.name}</td>
+                                        <td className='border border-[#ddd] px-[30px] py-[10px]'>{todo.createdAt}</td>
+                                        <td className='border border-[#ddd] px-[30px] py-[10px]'>
+                                            <span onClick={() => handleDeleteTodo(todo.id)}> <FontAwesomeIcon color='red' icon={faTrashCan} /></span>
+                                        </td>
+                                        <td className='border border-[#ddd] px-[30px] py-[10px]'>
+                                            <span onClick={() => handleOpenEdit(todo.id)}><FontAwesomeIcon color='#068FFF' icon={faPenToSquare} /></span>
+                                        </td>
+                                    </tr>
+                                    {openEdit && editId === todo.id && (
+                                        <tr>
+                                            <td colSpan="5" className='border border-[#ddd] px-[30px] py-[10px]'>
+                                                <form onSubmit={(e) => handleEditTodo(e,todo.id)} className='flex flex-row gap-[20px] items-center '>
+                                                    <input type="text" 
+                                                    name='todo'
+                                                    value={currentTodo.name}
+                                                    onChange={(e) => setCurrentTodo({...currentTodo,name : e.target.value})}
+                                                    placeholder="Edit Todo" 
+                                                    className='py-[5px] px-[4px] border-[1px] border-[#068FFF] rounded-[6px] outline-none '
+                                                    />
+                                                    <button type="submit"
+                                                    className='bg-[#19A7CE] rounded-[6px] text-[#ffffff] py-[5px] px-[20px] '
+                                                    >Edit</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                                
                             ))
                         )}
                     </tbody>
