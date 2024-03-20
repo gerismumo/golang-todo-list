@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gerismumo/golang-todo/server/internal/config"
+	"github.com/gerismumo/golang-todo/server/internal/model"
 	"github.com/gerismumo/golang-todo/server/api/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
@@ -16,10 +16,6 @@ type Todo struct {
 	Task string `json:"task"`
 }
 
-type responseData struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
 
 func Routes() {
 
@@ -28,10 +24,10 @@ func Routes() {
 	router := mux.NewRouter()
 
 	//routes
-	router.HandleFunc("/api/addTodo", config.AddTodo).Methods("POST")
-	router.HandleFunc("/api/getTodo", config.GetTodo).Methods("GET")
-	router.HandleFunc("/api/deleteTodo/{id}", config.DeleteTodo).Methods("DELETE")
-	router.HandleFunc("/api/editTodo/{id}", config.EditTodo).Methods("PUT")
+	router.HandleFunc("/api/addTodo", model.AddTodo).Methods("POST")
+	router.HandleFunc("/api/getTodo", model.GetTodo).Methods("GET")
+	router.HandleFunc("/api/deleteTodo/{id}", model.DeleteTodo).Methods("DELETE")
+	router.HandleFunc("/api/editTodo/{id}", model.EditTodo).Methods("PUT")
 
 	//cors handler
 

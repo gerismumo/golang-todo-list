@@ -1,8 +1,9 @@
-package config
+package model
 
 import (
 	"encoding/json"
 	"net/http"
+
 	"github.com/gerismumo/golang-todo/server/internal/database"
 )
 

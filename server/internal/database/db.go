@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"log"
 
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	
 )
 
-func ConnectDb() *sql.DB {
 
+func ConnectDb() *sql.DB {
+	
 	if err := godotenv.Load(); err != nil {
-		log.Println("Error loading.env file")
+		log.Println("Error loading.env file: %v", err)
 	}
 
 	var err error
