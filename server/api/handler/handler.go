@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/gerismumo/golang-todo/server/internal/model"
 	"github.com/gerismumo/golang-todo/server/api/middleware"
+	"github.com/gerismumo/golang-todo/server/internal/model"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -15,7 +16,6 @@ import (
 type Todo struct {
 	Task string `json:"task"`
 }
-
 
 func Routes() {
 
@@ -38,8 +38,8 @@ func Routes() {
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)(corsHandler)
 
-	fmt.Println("Server listening on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", corsHandler))
+	port := os.Getenv("PORT")
+
+	fmt.Printf("Server listening on port %v...", port)
+	log.Fatal(http.ListenAndServe(":"+port, corsHandler))
 }
-
-
