@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -18,11 +17,16 @@ func ConnectDb() *sql.DB {
 
 	var err error
 
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
+	// dbUser := os.Getenv("DB_USER")
+	// dbPassword := os.Getenv("DB_PASSWORD")
+	// dbHost := os.Getenv("DB_HOST")
+	// dbPort := os.Getenv("DB_PORT")
+	// dbName := os.Getenv("DB_NAME")
+	dbUser := "todoList"
+	dbPassword := "todoList"
+	dbHost := "localhost"
+	dbPort := "3306"
+	dbName := "todoList"
 
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 
@@ -30,7 +34,7 @@ func ConnectDb() *sql.DB {
 
 	if err != nil {
 		log.Println("error occured", err)
-	} 
+	}
 
 	if err := db.Ping(); err != nil {
 		log.Println("Error connecting to the database:", err)
