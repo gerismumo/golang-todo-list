@@ -1,25 +1,27 @@
-package main
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/gerismumo/golang-todo/server/connect"
 )
 
 
 
-func addTodo(w http.ResponseWriter, r *http.Request) {
-	db := connectDb()
+func DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	db := connect.ConnectDb()
+
 	defer db.Close()
 
-	var todo Todo
-	json.NewDecoder(r.Body).Decode(&todo)
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-	defer r.Body.Close()
-
-	if todo.Task == "" {
+	if id == "" {
 		response := responseData{
 			Success: false,
-			Message: "Task cannot be empty",
+			Message: "ID cannot be empty",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -28,8 +30,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//insert data into database
-	result, err := db.Exec("INSERT INTO todo_list (name) VALUES (?)", todo.Task)
+	result, err := db.Exec("DELETE FROM todo_list WHERE id =?", id)
 
 	if err != nil {
 		response := responseData{
@@ -43,6 +44,7 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rowsAffected, err := result.RowsAffected()
+
 	if err != nil {
 		response := responseData{
 			Success: false,
@@ -57,10 +59,12 @@ func addTodo(w http.ResponseWriter, r *http.Request) {
 	if rowsAffected > 0 {
 		response := responseData{
 			Success: true,
-			Message: "successfully created",
+			Message: "successfully deleted",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
+
+		return
 	}
 }

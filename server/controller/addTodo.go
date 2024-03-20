@@ -1,27 +1,33 @@
-package main
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/gerismumo/golang-todo/server/connect"
 )
 
-func editTodo(w http.ResponseWriter, r *http.Request) {
-	db := connectDb()
+type Todo struct {
+	Task string `json:"task"`
+}
 
+type responseData struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+func AddTodo(w http.ResponseWriter, r *http.Request) {
+	db := connect.ConnectDb()
 	defer db.Close()
-
-	vars := mux.Vars(r)
-	id := vars["id"]
 
 	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 
-	if id == "" || todo.Task == "" {
+	defer r.Body.Close()
+
+	if todo.Task == "" {
 		response := responseData{
 			Success: false,
-			Message: "Fill all the fields",
+			Message: "Task cannot be empty",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -30,7 +36,8 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := db.Exec("UPDATE todo_list SET name =? WHERE id = ?", todo.Task, id)
+	//insert data into database
+	result, err := db.Exec("INSERT INTO todo_list (name) VALUES (?)", todo.Task)
 
 	if err != nil {
 		response := responseData{
@@ -44,7 +51,6 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
 	if err != nil {
 		response := responseData{
 			Success: false,
@@ -59,12 +65,10 @@ func editTodo(w http.ResponseWriter, r *http.Request) {
 	if rowsAffected > 0 {
 		response := responseData{
 			Success: true,
-			Message: " edited successfully",
+			Message: "successfully created",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
-
-		return
 	}
 }

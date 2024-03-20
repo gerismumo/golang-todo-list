@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gerismumo/golang-todo/server/controller"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -26,10 +27,10 @@ func main() {
 	router := mux.NewRouter()
 
 	//routes
-	router.HandleFunc("/api/addTodo", addTodo).Methods("POST")
-	router.HandleFunc("/api/getTodo", getTodo).Methods("GET")
-	router.HandleFunc("/api/deleteTodo/{id}", deleteTodo).Methods("DELETE")
-	router.HandleFunc("/api/editTodo/{id}", editTodo).Methods("PUT")
+	router.HandleFunc("/api/addTodo", controller.AddTodo).Methods("POST")
+	router.HandleFunc("/api/getTodo", controller.GetTodo).Methods("GET")
+	router.HandleFunc("/api/deleteTodo/{id}", controller.DeleteTodo).Methods("DELETE")
+	router.HandleFunc("/api/editTodo/{id}", controller.EditTodo).Methods("PUT")
 
 	//cors handler
 

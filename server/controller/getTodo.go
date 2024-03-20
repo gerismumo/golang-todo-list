@@ -1,12 +1,13 @@
-package main
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
+	"github.com/gerismumo/golang-todo/server/connect"
 )
 
-func getTodo(w http.ResponseWriter, r *http.Request) {
-	db := connectDb()
+func GetTodo(w http.ResponseWriter, r *http.Request) {
+	db := connect.ConnectDb()
 	defer db.Close()
 
 	type QueryTodo struct {

@@ -1,4 +1,4 @@
-package main
+package connect
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func connectDb() *sql.DB {
+func ConnectDb() *sql.DB {
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("Error loading.env file")

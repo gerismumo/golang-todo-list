@@ -1,24 +1,28 @@
-package main
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gerismumo/golang-todo/server/connect"
 )
 
-func deleteTodo(w http.ResponseWriter, r *http.Request) {
-	db := connectDb()
+func EditTodo(w http.ResponseWriter, r *http.Request) {
+	db := connect.ConnectDb()
 
 	defer db.Close()
 
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	if id == "" {
+	var todo Todo
+	json.NewDecoder(r.Body).Decode(&todo)
+
+	if id == "" || todo.Task == "" {
 		response := responseData{
 			Success: false,
-			Message: "ID cannot be empty",
+			Message: "Fill all the fields",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -27,7 +31,7 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := db.Exec("DELETE FROM todo_list WHERE id =?", id)
+	result, err := db.Exec("UPDATE todo_list SET name =? WHERE id = ?", todo.Task, id)
 
 	if err != nil {
 		response := responseData{
@@ -56,7 +60,7 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 	if rowsAffected > 0 {
 		response := responseData{
 			Success: true,
-			Message: "successfully deleted",
+			Message: " edited successfully",
 		}
 
 		w.Header().Set("Content-Type", "application/json")
