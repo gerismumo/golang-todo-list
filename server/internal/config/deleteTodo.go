@@ -1,17 +1,17 @@
-package controller
+package config
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gerismumo/golang-todo/server/connect"
+	"github.com/gerismumo/golang-todo/server/internal/database"
 )
 
 
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request) {
-	db := connect.ConnectDb()
+	db := database.ConnectDb()
 
 	defer db.Close()
 
